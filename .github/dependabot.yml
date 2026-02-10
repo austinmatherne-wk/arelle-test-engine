@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    cooldown:
+      default-days: 1
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      gha-dependencies:
+        patterns:
+          - "*"
+  - package-ecosystem: pip
+    cooldown:
+      default-days: 1
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
