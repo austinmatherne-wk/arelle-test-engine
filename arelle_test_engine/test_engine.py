@@ -385,7 +385,7 @@ class TestEngine:
                     else:
                         result_callback(result)
                 elif not result.skip:
-                    print(result.report())
+                    print(f"[{result.status}] {result.testcase.full_id}")
             return result_list
 
     def _run_testcases_in_series(
@@ -407,7 +407,7 @@ class TestEngine:
                 else:
                     result_callback(result)
             elif not result.skip:
-                print(result.report())
+                print(f"[{result.status}] {testcase.full_id}")
         return results
 
     def _validate_testcase_set(

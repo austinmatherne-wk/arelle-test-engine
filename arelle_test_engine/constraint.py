@@ -19,9 +19,10 @@ class Constraint:
     qname: QName | None = None
 
     def __str__(self) -> str:
-        value = str(self.qname or self.pattern or "(any)")
+        code = str(self.qname or self.pattern or "(any)")
+        value = "(any)" if code == "*" else code
         if self.level:
-            value += f" [{self.level}]"
+            value = f"[{self.level}]{value}"
         if self.count != 1:
             value += f" x{self.count}"
         return value
