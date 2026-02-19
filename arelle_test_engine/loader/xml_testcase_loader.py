@@ -210,7 +210,6 @@ def _load_testcase_doc(doc: ModelDocument, index_file: Path, testcases: list[Tes
                 name=variation.name,
                 parameters=PARAMETER_SEPARATOR.join(parameters),
                 read_first_uris=variation.readMeFirstUris,
-                status=variation.status,
                 constraint_set=constraint_set,
             ))
             testcases_found = True

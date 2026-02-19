@@ -24,5 +24,4 @@ class Testcase:
     name: str
     parameters: str
     read_first_uris: list[str]
-    status: str
     constraint_set: ConstraintSet
