@@ -27,7 +27,7 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  --config CONFIG       Path to a config file (TOML, JSON).
+  --config CONFIG       Path to a JSON configuration file.
   --compare-formula-output
                         Treat 'instance' elements in expected testcase results as expected formula output rather than instance facts.
   --filter FILTERS      If any are provided, only testcases with an ID matching a filter will be executed.
