@@ -197,6 +197,16 @@ def _load_testcase_doc(doc: ModelDocument, index_file: Path, testcases: list[Tes
                 constraints=constraints,
                 match_all=False,
             )
+
+            # The `reference` property breaks if `efmNameElt` has `NoneType` for `text`.
+            # Rather than fixing that code (which will eventually be replaced), we'll just
+            # swallow the AttributeError here.
+            reference: str | None = None
+            try:
+                reference = variation.reference
+            except AttributeError:
+                pass
+
             testcases.append(Testcase(
                 base=base_path,
                 blocked_code_pattern=variation.blockedMessageCodes,
@@ -210,7 +220,7 @@ def _load_testcase_doc(doc: ModelDocument, index_file: Path, testcases: list[Tes
                 name=variation.name,
                 parameters=PARAMETER_SEPARATOR.join(parameters),
                 read_first_uris=variation.readMeFirstUris,
-                reference=variation.reference,
+                reference=reference,
                 constraint_set=constraint_set,
             ))
             testcases_found = True
