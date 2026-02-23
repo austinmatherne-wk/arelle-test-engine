@@ -13,6 +13,25 @@ Improves on Arelle's internal test suite validation process:
 - Each execution is easily reproducible (each execution produces runtime options JSON that can be used with `--optionsFile`).
 - Each execution produces a dedicated log file.
 
+## Installing the Test Engine
+
+### Standalone Installation {#standalone-installation}
+To use the Arelle Test Engine separately from a local copy of the Arelle source code,
+clone this repository and install dependencies:
+```bash
+pip install -r requirements.txt
+```
+This will install a recent version of Arelle (and the necessary dependencies) to run the test engine against.
+
+### Installation within an Arelle Development Environment
+The Arelle Test Engine will eventually be incorporated into Arelle as a top-level module within the Arelle repository.
+To simulate this setup, you can symlink the `arelle_test_engine` directory into your Arelle development environment.
+From the root of your Arelle development environment, run:
+```bash
+ln -s /path/to/arelle-test-engine/arelle_test_engine arelle_test_engine
+```
+Alternatively, copying the directory will also work.
+
 ## Using the Test Engine
 
 ### Use as a Command Line Tool
@@ -54,7 +73,7 @@ The Arelle Test Engine can be uses as a command line tool by passing options by:
 Certain options (those involving more complex data structures) can only be configured by file.
 See [`TestEngineOptions`](./arelle_test_engine/test_engine_options.py) for more details on available options and their formats.
 
-## Using as a Python Module
+### Using as a Python Module
 ```python
 from arelle_test_engine.test_engine import TestEngine
 from arelle_test_engine.test_engine_options import TestEngineOptions
@@ -73,6 +92,7 @@ else:
 
 
 ## Testing the Test Engine
+Note: A [standalone installation](#standalone-installation) is required to run the tests for the Arelle Test Engine.
 
 ### Run Unit Tests
 ```bash
