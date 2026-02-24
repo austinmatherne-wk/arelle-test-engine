@@ -358,6 +358,10 @@ class TestEngine:
         testcase, = input_args
         return self._run_testcase(testcase)
 
+    def _run_testcase_with_queue(self, testcase: Testcase, queue: multiprocessing.Queue[TestcaseResult]) -> None:
+        result = self._run_testcase(testcase)
+        queue.put(result)
+
     def _run_testcases_in_parallel(
             self,
             testcases: list[Testcase],
@@ -395,9 +399,13 @@ class TestEngine:
             result_callback: Callable[[TestcaseResult], None] | None = None,
             ui_thread_queue: Queue[tuple[Callable[[TestcaseResult], None], list[TestcaseResult]]] | None = None,
     ) -> list[TestcaseResult]:
+        queue: multiprocessing.Queue[TestcaseResult] = multiprocessing.Queue()
         results = []
         for testcase in testcases:
-            result = self._run_testcase(testcase)
+            process = multiprocessing.Process(target=self._run_testcase_with_queue, args=(testcase, queue))
+            process.start()
+            process.join()
+            result = queue.get()
             results.append(result)
             if result_callback is not None:
                 if ui_thread_queue is not None:
