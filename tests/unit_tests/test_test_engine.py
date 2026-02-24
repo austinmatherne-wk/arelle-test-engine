@@ -3,6 +3,8 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from queue import Queue
+from typing import Callable
 from unittest.mock import patch
 
 import pytest
@@ -19,6 +21,7 @@ from arelle_test_engine.test_engine import (
 )
 from arelle_test_engine.test_engine_options import TestEngineOptions
 from arelle_test_engine.testcase import Testcase
+from arelle_test_engine.testcase_result import TestcaseResult
 from arelle_test_engine.testcase_set import TestcaseSet
 
 
@@ -138,10 +141,35 @@ class TestTestEngine:
     @patch("arelle_test_engine.test_engine._validate")
     @patch("arelle_test_engine.test_engine._collect_errors")
     @patch("arelle_test_engine.test_engine.load_testcase_index")
+    @patch("arelle_test_engine.test_engine.TestEngine._run_testcases_in_series")
     @patch("arelle.api.Session.Session.run")
-    def test_run(self, mock_run, mock_load_testcase_index, mock_collect_errors, mock_validate, testcase) -> None:
+    def test_run(
+            self,
+            mock_run,
+            mock_run_testcases_in_series,
+            mock_load_testcase_index,
+            mock_collect_errors,
+            mock_validate,
+            testcase
+    ) -> None:
         # Prevent Session from actually executing
         mock_run.return_value = True
+
+        # Actual implementation spawns separate processes for testcases,
+        # so we need to override it to run in-process to maintain mocks.
+        def run_testcases_in_series(
+                testcases: list[Testcase],
+                result_callback: Callable[[TestcaseResult], None] | None = None,
+                ui_thread_queue: Queue[tuple[Callable[[TestcaseResult], None], list[TestcaseResult]]] | None = None,
+        ) -> list[TestcaseResult]:
+            results = []
+            for _testcase in testcases:
+                _result = test_engine._run_testcase(_testcase)
+                results.append(_result)
+            return results
+
+        mock_run_testcases_in_series.side_effect = run_testcases_in_series
+
         # Override testcase variation loading
         mock_load_testcase_index.return_value = TestcaseSet(
             load_errors=[],

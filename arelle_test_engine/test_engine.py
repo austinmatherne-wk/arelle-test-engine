@@ -354,9 +354,9 @@ class TestEngine:
                 f.write(f"---TEST END---\n{result.report()}")
         return result
 
-    def _run_testcase_args(self, input_args: tuple[Testcase]) -> TestcaseResult:
-        testcase, = input_args
-        return self._run_testcase(testcase)
+    def _run_testcase_with_queue(self, testcase: Testcase, queue: multiprocessing.Queue[TestcaseResult]) -> None:
+        result = self._run_testcase(testcase)
+        queue.put(result)
 
     def _run_testcases_in_parallel(
             self,
@@ -366,14 +366,14 @@ class TestEngine:
             ui_thread_queue: Queue[tuple[Callable[[TestcaseResult], None], list[TestcaseResult]]] | None = None,
     ) -> list[TestcaseResult]:
         tasks = [
-            (testcase,)
+            testcase
             for testcase in testcases
         ]
         # Some parts of Arelle and it's plugins have global state that is not reset.
         # Setting maxtasksperchild helps ensure global state does not persist between
         # two tasks run by the same child process.
         with multiprocessing.Pool(maxtasksperchild=1, processes=processes) as pool:
-            results = pool.imap_unordered(self._run_testcase_args, tasks)
+            results = pool.imap_unordered(self._run_testcase, tasks)
             result_list = []
             for result in results:
                 result_list.append(result)
@@ -395,9 +395,14 @@ class TestEngine:
             result_callback: Callable[[TestcaseResult], None] | None = None,
             ui_thread_queue: Queue[tuple[Callable[[TestcaseResult], None], list[TestcaseResult]]] | None = None,
     ) -> list[TestcaseResult]:
+        queue: multiprocessing.Queue[TestcaseResult] = multiprocessing.Queue(maxsize=1)
         results = []
         for testcase in testcases:
-            result = self._run_testcase(testcase)
+            process = multiprocessing.Process(target=self._run_testcase_with_queue, args=(testcase, queue))
+            process.start()
+            process.join()
+            assert not queue.empty(), "Expected result in queue after process completed, but queue was empty."
+            result = queue.get()
             results.append(result)
             if result_callback is not None:
                 if ui_thread_queue is not None:
