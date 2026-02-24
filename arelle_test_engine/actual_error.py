@@ -15,5 +15,5 @@ class ActualError:
     def __str__(self) -> str:
         code = "(any)" if self.code == "*" else self.code
         if self.level:
-            return f"{code} [{self.level}]"
+            return f"[{self.level}]{code}"
         return code

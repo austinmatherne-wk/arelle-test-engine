@@ -32,7 +32,7 @@ class TestcaseResult:
         return (
             f"[{self}]\n"
             f"\tID: {self.testcase.full_id}\n"
-            f"\tStatus: {self.status.upper()}\n"
+            f"\tStatus: {self.status}\n"
             f"\tDuration: {self.duration_seconds:.2f} seconds\n"
             f"\tExpected:\n"
             + ("\n".join(f"\t\t {e}" for e in self.applied_constraint_set.constraints) if self.applied_constraint_set.constraints else "\t\t None") + "\n"

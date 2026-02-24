@@ -90,7 +90,7 @@ class CsvTestcaseLoader(TestcaseLoader):
                     name=local_id,
                     parameters="",
                     read_first_uris=[str(_input)],
-                    status="",
+                    reference=None,
                     constraint_set=constraint_set,
                 ))
         return TestcaseSet(
