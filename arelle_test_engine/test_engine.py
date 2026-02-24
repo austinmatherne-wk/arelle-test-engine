@@ -395,7 +395,7 @@ class TestEngine:
             result_callback: Callable[[TestcaseResult], None] | None = None,
             ui_thread_queue: Queue[tuple[Callable[[TestcaseResult], None], list[TestcaseResult]]] | None = None,
     ) -> list[TestcaseResult]:
-        queue: multiprocessing.Queue[TestcaseResult] = multiprocessing.Queue()
+        queue: multiprocessing.Queue[TestcaseResult] = multiprocessing.Queue(maxsize=1)
         results = []
         for testcase in testcases:
             process = multiprocessing.Process(target=self._run_testcase_with_queue, args=(testcase, queue))
