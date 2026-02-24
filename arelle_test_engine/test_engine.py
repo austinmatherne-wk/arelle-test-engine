@@ -401,6 +401,7 @@ class TestEngine:
             process = multiprocessing.Process(target=self._run_testcase_with_queue, args=(testcase, queue))
             process.start()
             process.join()
+            assert not queue.empty(), "Expected result in queue after process completed, but queue was empty."
             result = queue.get()
             results.append(result)
             if result_callback is not None:
